@@ -1,8 +1,11 @@
+using Abstracciones.Interfaces.DA;
+using DA;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Registrar los controladores de la API.
 builder.Services.AddControllers();
+builder.Services.AddScoped<IAlbumDA, AlbumDA>();
 
 // Registrar servicios para explorar los endpoints.
 builder.Services.AddEndpointsApiExplorer();

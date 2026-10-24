@@ -10,6 +10,7 @@ builder.Services.AddControllers();
 
 // Registrar servicios para explorar los endpoints.
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Inyección de dependencias: flujo y acceso a datos.
 builder.Services.AddScoped<IAlbumFlujo, AlbumFlujo>();
@@ -21,9 +22,15 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
+
+// Archivos estáticos.
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseAuthorization();
 

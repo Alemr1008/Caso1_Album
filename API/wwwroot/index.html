@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vinilo Tico · API de Álbumes</title>
+  <style>
+    :root {
+      --bg: #f6f3ee;
+      --surface: #ffffff;
+      --text: #1d1b1a;
+      --muted: #6a645e;
+      --line: #ddd6cc;
+      --accent: #1f4e5f;
+      --get: #1b6b43;
+      --post: #1f4e9a;
+      --put: #8a5a00;
+      --delete: #a12626;
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #17191b;
+        --surface: #1f2224;
+        --text: #ece8e2;
+        --muted: #a29b92;
+        --line: #33383b;
+        --accent: #7fc1d6;
+        --get: #66c28f;
+        --post: #7fa9ee;
+        --put: #e0b45a;
+        --delete: #ee8585;
+        color-scheme: dark;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif;
+      line-height: 1.55;
+    }
+    main { max-width: 56rem; margin: 0 auto; padding: 3rem 1.25rem 4rem; }
+    header { display: flex; align-items: center; gap: 1.25rem; margin-bottom: 2.5rem; }
+    .disc {
+      flex: none;
+      width: 5rem; height: 5rem; border-radius: 50%;
+      background:
+        radial-gradient(circle, var(--bg) 0 8%, var(--accent) 8% 30%, transparent 30%),
+        repeating-radial-gradient(circle, var(--text) 0 2px, var(--surface) 2px 5px);
+      border: 1px solid var(--line);
+    }
+    h1 { margin: 0; font-size: 2rem; letter-spacing: -0.01em; }
+    header p { margin: 0.25rem 0 0; color: var(--muted); }
+    h2 { font-size: 1.15rem; margin: 0 0 0.75rem; }
+    .table-wrap {
+      overflow-x: auto;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 40rem; }
+    th, td { text-align: left; padding: 0.8rem 1rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    tr:last-child td { border-bottom: 0; }
+    .method { font-weight: 700; font-family: Consolas, "Courier New", monospace; }
+    .GET { color: var(--get); }
+    .POST { color: var(--post); }
+    .PUT { color: var(--put); }
+    .DELETE { color: var(--delete); }
+    code { font-family: Consolas, "Courier New", monospace; font-size: 0.92rem; }
+    .links { margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+    .links a {
+      color: var(--accent); font-weight: 600; text-decoration: none;
+      border: 1px solid var(--accent); border-radius: 6px; padding: 0.55rem 1rem;
+    }
+    .links a:hover { background: var(--accent); color: var(--bg); }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="disc" aria-hidden="true"></div>
+      <div>
+        <h1>Vinilo Tico · API de Álbumes</h1>
+        <p>Catálogo de álbumes de la tienda, disponible para el sitio web y la app móvil.</p>
+      </div>
+    </header>
+
+    <section>
+      <h2>Endpoints disponibles</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Método</th>
+              <th>Ruta</th>
+              <th>Qué hace</th>
+              <th>Respuestas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="method GET">GET</td>
+              <td><code>/api/Album</code><br><code>/api/Album?artista=beatles</code></td>
+              <td>Lista todos los álbumes. Con <code>artista</code> filtra por nombre del artista.</td>
+              <td>200</td>
+            </tr>
+            <tr>
+              <td class="method GET">GET</td>
+              <td><code>/api/Album/{Id}</code></td>
+              <td>Consulta un álbum por su Id (Guid).</td>
+              <td>200, 404</td>
+            </tr>
+            <tr>
+              <td class="method POST">POST</td>
+              <td><code>/api/Album</code></td>
+              <td>Crea un álbum nuevo con los datos del body en JSON.</td>
+              <td>201 con header Location</td>
+            </tr>
+            <tr>
+              <td class="method PUT">PUT</td>
+              <td><code>/api/Album/{Id}</code></td>
+              <td>Reemplaza los datos de un álbum existente.</td>
+              <td>204, 404</td>
+            </tr>
+            <tr>
+              <td class="method DELETE">DELETE</td>
+              <td><code>/api/Album/{Id}</code></td>
+              <td>Elimina un álbum.</td>
+              <td>204, 404</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <nav class="links" aria-label="Enlaces útiles">
+      <a href="/swagger">Abrir Swagger</a>
+      <a href="/api/Album">Ver álbumes (JSON)</a>
+    </nav>
+
+    <footer>Caso 1</footer>
+  </main>
+</body>
+</html>

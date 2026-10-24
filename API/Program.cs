@@ -6,6 +6,7 @@ builder.Services.AddControllers();
 
 // Registrar servicios para explorar los endpoints.
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -13,9 +14,15 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
+
+// Archivos estáticos.
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseAuthorization();
 

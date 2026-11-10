@@ -2,6 +2,7 @@ using Abstracciones.Interfaces.API;
 using Abstracciones.Interfaces.Flujo;
 using Abstracciones.Modelos;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace API.Controllers
 {
@@ -61,6 +62,26 @@ namespace API.Controllers
             if (!eliminado)
                 return NotFound(); // 404
             return NoContent(); // 204
+        }
+
+        // GET api/Album/descargar-csv
+        [HttpGet("descargar-csv")]
+        public async Task<IActionResult> DescargarCsv()
+        {
+            var albumes = await _albumFlujo.Obtener(null);
+            var csvBuilder = new StringBuilder();
+
+            // Cabeceras del CSV (ajusta los nombres de las propiedades según tu modelo de respuesta)
+            csvBuilder.AppendLine("Id,Titulo,Artista,Genero,AnioLanzamiento,CantidadCanciones");
+
+            // Filas de datos
+            foreach (var album in albumes)
+            {
+                csvBuilder.AppendLine($"{album.Id},{album.Titulo},{album.Artista},{album.Genero},{album.AnioLanzamiento},{album.CantidadCanciones}");
+            }
+
+            var bytes = Encoding.UTF8.GetBytes(csvBuilder.ToString());
+            return File(bytes, "text/csv", "ReporteAlbumes.csv");
         }
     }
 }

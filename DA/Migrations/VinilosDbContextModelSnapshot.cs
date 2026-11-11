@@ -84,6 +84,9 @@ namespace DA.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("AnioFormacion")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -102,18 +105,21 @@ namespace DA.Migrations
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            AnioFormacion = 0,
                             Nombre = "Michael Jackson",
                             Pais = "Estados Unidos"
                         },
                         new
                         {
                             Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                            AnioFormacion = 0,
                             Nombre = "The Beatles",
                             Pais = "Reino Unido"
                         },
                         new
                         {
                             Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                            AnioFormacion = 0,
                             Nombre = "Bad Bunny",
                             Pais = "Puerto Rico"
                         });

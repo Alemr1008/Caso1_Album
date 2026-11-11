@@ -42,7 +42,8 @@ namespace DA
             {
                 Id = Guid.NewGuid(),
                 Nombre = artista.Nombre,
-                Pais = artista.Pais
+                Pais = artista.PaisOrigen,
+                AnioFormacion = artista.AnioFormacion
             };
 
             _contexto.Artistas.Add(entidad);
@@ -51,11 +52,42 @@ namespace DA
             return entidad.Id;
         }
 
+        // PUT: reemplaza los datos del artista (excepto el Id).
+        public async Task<bool> Editar(Guid Id, ArtistaRequest artista)
+        {
+            var entidad = await _contexto.Artistas.FindAsync(Id);
+            if (entidad == null)
+                return false;
+
+            entidad.Nombre = artista.Nombre;
+            entidad.Pais = artista.PaisOrigen;
+            entidad.AnioFormacion = artista.AnioFormacion;
+
+            await _contexto.SaveChangesAsync();
+            return true;
+        }
+
+        // DELETE: quita el artista si existe y no tiene álbumes (FK Restrict); si no, devuelve false.
+        public async Task<bool> Eliminar(Guid Id)
+        {
+            var entidad = await _contexto.Artistas.FindAsync(Id);
+            if (entidad == null)
+                return false;
+
+            if (await _contexto.Albumes.AnyAsync(a => a.ArtistaId == Id))
+                return false;
+
+            _contexto.Artistas.Remove(entidad);
+            await _contexto.SaveChangesAsync();
+            return true;
+        }
+
         private static ArtistaResponse AResponse(ArtistaEntidad a) => new ArtistaResponse
         {
             Id = a.Id,
             Nombre = a.Nombre,
-            Pais = a.Pais
+            PaisOrigen = a.Pais,
+            AnioFormacion = a.AnioFormacion
         };
     }
 }

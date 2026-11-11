@@ -14,19 +14,29 @@ namespace Flujo
         }
 
         // Sin reglas de negocio: cada método delega en el DA.
-        public Task<IEnumerable<ArtistaResponse>> Obtener()
+        public Task<IEnumerable<ArtistaResponse>> ObtenerArtistas()
         {
             return _artistaDA.Obtener();
         }
 
-        public Task<ArtistaResponse?> Obtener(Guid Id)
+        public Task<ArtistaResponse?> ObtenerArtistaPorId(Guid id)
         {
-            return _artistaDA.Obtener(Id);
+            return _artistaDA.Obtener(id);
         }
 
-        public Task<Guid> Agregar(ArtistaRequest artista)
+        public Task<Guid> CrearArtista(ArtistaRequest artista)
         {
             return _artistaDA.Agregar(artista);
+        }
+
+        public Task<bool> ActualizarArtista(Guid id, ArtistaRequest artista)
+        {
+            return _artistaDA.Editar(id, artista);
+        }
+
+        public Task<bool> EliminarArtista(Guid id)
+        {
+            return _artistaDA.Eliminar(id);
         }
     }
 }

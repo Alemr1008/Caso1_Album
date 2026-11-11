@@ -12,6 +12,8 @@ namespace DA.Entidades
 
         public string Pais { get; set; } = string.Empty;
 
+        public int AnioFormacion { get; set; }
+
         public ICollection<AlbumEntidad> Albumes { get; set; }
             = new List<AlbumEntidad>();
     }

@@ -9,5 +9,9 @@ namespace Abstracciones.Interfaces.DA
         Task<ArtistaResponse?> Obtener(Guid Id);
 
         Task<Guid> Agregar(ArtistaRequest artista);
+
+        Task<bool> Editar(Guid Id, ArtistaRequest artista);
+
+        Task<bool> Eliminar(Guid Id);
     }
 }

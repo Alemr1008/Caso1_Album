@@ -1,5 +1,4 @@
-﻿
-using Abstracciones.Modelos;
+﻿using Abstracciones.Modelos;
 
 namespace Abstracciones.Interfaces.Flujo
 {
@@ -9,10 +8,12 @@ namespace Abstracciones.Interfaces.Flujo
 
         Task<AlbumResponse?> Obtener(Guid Id);
 
-        Task<Guid> Agregar(AlbumRequest album);
+        Task<Guid> Agregar(AlbumRequest album);   // Guid.Empty si el artista no existe
 
         Task<bool> Editar(Guid Id, AlbumRequest album);
 
         Task<bool> Eliminar(Guid Id);
+
+        Task<string> ExportarCsv();
     }
 }

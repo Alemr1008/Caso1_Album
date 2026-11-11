@@ -37,8 +37,9 @@ builder.Services.AddDbContext<VinilosDbContext>(options =>
 builder.Services.AddScoped<IAlbumFlujo, AlbumFlujo>();
 builder.Services.AddScoped<IAlbumDA, AlbumDA>();
 
-// Los servicios de Artista se registrarán
-// cuando estén creadas sus interfaces y clases.
+// Registrar servicios de Artista.
+builder.Services.AddScoped<IArtistaFlujo, ArtistaFlujo>();
+builder.Services.AddScoped<IArtistaDA, ArtistaDA>();
 
 // ==========================================
 // CONSTRUCCIÓN DE LA APLICACIÓN

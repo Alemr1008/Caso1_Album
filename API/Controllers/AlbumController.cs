@@ -2,6 +2,7 @@ using Abstracciones.Interfaces.API;
 using Abstracciones.Interfaces.Flujo;
 using Abstracciones.Modelos;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace API.Controllers
 {
@@ -39,6 +40,8 @@ namespace API.Controllers
         public async Task<IActionResult> Agregar([FromBody] AlbumRequest album)
         {
             var id = await _albumFlujo.Agregar(album);
+            if (id == Guid.Empty)
+                return BadRequest("El artista indicado no existe."); // 400
             var albumCreado = await _albumFlujo.Obtener(id);
             return CreatedAtAction(nameof(Obtener), new { Id = id }, albumCreado); // 201 + Location
         }
@@ -61,6 +64,15 @@ namespace API.Controllers
             if (!eliminado)
                 return NotFound(); // 404
             return NoContent(); // 204
+        }
+
+        // GET api/Album/descargar-csv
+        [HttpGet("descargar-csv")]
+        public async Task<IActionResult> DescargarCsv()
+        {
+            var csv = await _albumFlujo.ExportarCsv();
+            var bytes = Encoding.UTF8.GetPreamble().Concat(Encoding.UTF8.GetBytes(csv)).ToArray();
+            return File(bytes, "text/csv", "albumes.csv");
         }
     }
 }

@@ -1,137 +1,104 @@
-﻿
-using Abstracciones.Interfaces.DA;
+﻿using Abstracciones.Interfaces.DA;
 using Abstracciones.Modelos;
+using DA.Entidades;
+using Microsoft.EntityFrameworkCore;
 
 namespace DA
 {
     public class AlbumDA : IAlbumDA
     {
-        // Lista estática que conserva los álbumes
-        // mientras la aplicación esté ejecutándose.
-        private static readonly List<AlbumResponse> albumes = new()
+        private readonly VinilosDbContext _contexto;
+
+        public AlbumDA(VinilosDbContext contexto)
         {
-            new AlbumResponse
-            {
-                Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                Titulo = "Thriller",
-                Artista = "Michael Jackson",
-                Genero = "Pop",
-                AnioLanzamiento = 1982,
-                CantidadCanciones = 9
-            },
+            _contexto = contexto;
+        }
 
-            new AlbumResponse
-            {
-                Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                Titulo = "Abbey Road",
-                Artista = "The Beatles",
-                Genero = "Rock",
-                AnioLanzamiento = 1969,
-                CantidadCanciones = 17
-            },
-
-            new AlbumResponse
-            {
-                Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                Titulo = "Un Verano Sin Ti",
-                Artista = "Bad Bunny",
-                Genero = "Reggaetón",
-                AnioLanzamiento = 2022,
-                CantidadCanciones = 23
-            }
-        };
-
-        // GET: Obtener todos los álbumes o filtrar por artista.
-        public Task<IEnumerable<AlbumResponse>> Obtener(string? artista)
+        // GET: todos los álbumes (con su artista) o filtrados por artista.
+        public async Task<IEnumerable<AlbumResponse>> Obtener(string? artista)
         {
-            IEnumerable<AlbumResponse> resultado = albumes;
+            var consulta = _contexto.Albumes
+                .Include(a => a.Artista)
+                .AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(artista))
-            {
-                resultado = albumes.Where(a =>
-                    a.Artista.Contains(
-                        artista,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                );
-            }
+                consulta = consulta.Where(a =>
+                    EF.Functions.Like(a.Artista.Nombre, $"%{artista}%"));
 
-            return Task.FromResult(resultado);
+            var albumes = await consulta.OrderBy(a => a.Titulo).ToListAsync();
+
+            return albumes.Select(AResponse);
         }
 
-        // GET: Obtener un álbum por su identificador.
-        public Task<AlbumResponse?> Obtener(Guid Id)
+        // GET: un álbum por su Id, o null si no existe.
+        public async Task<AlbumResponse?> Obtener(Guid Id)
         {
-            AlbumResponse? album = albumes.FirstOrDefault(
-                a => a.Id == Id
-            );
+            var album = await _contexto.Albumes
+                .Include(a => a.Artista)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.Id == Id);
 
-            return Task.FromResult(album);
+            return album == null ? null : AResponse(album);
         }
 
-        //Agregar (POST).
-        public Task<Guid> Agregar(AlbumRequest album)
+        // POST: crea el álbum y devuelve el Id generado.
+        public async Task<Guid> Agregar(AlbumRequest album)
         {
-            // Crear el nuevo álbum con un identificador único.
-            AlbumResponse nuevoAlbum = new AlbumResponse
+            var entidad = new AlbumEntidad
             {
                 Id = Guid.NewGuid(),
                 Titulo = album.Titulo,
-                Artista = album.Artista,
                 Genero = album.Genero,
                 AnioLanzamiento = album.AnioLanzamiento,
-                CantidadCanciones = album.CantidadCanciones
+                CantidadCanciones = album.CantidadCanciones,
+                ArtistaId = album.ArtistaId
             };
 
-            // Agregar el álbum a la lista en memoria.
-            albumes.Add(nuevoAlbum);
+            _contexto.Albumes.Add(entidad);
+            await _contexto.SaveChangesAsync();
 
-            // Devolver el identificador generado.
-            return Task.FromResult(nuevoAlbum.Id);
+            return entidad.Id;
         }
 
-        //Editar (PUT).
-
-        public Task<bool> Editar(Guid Id, AlbumRequest album)
+        // PUT: reemplaza los datos del álbum (excepto el Id).
+        public async Task<bool> Editar(Guid Id, AlbumRequest album)
         {
-            // Buscar el álbum que se desea modificar.
-            AlbumResponse? albumExistente =
-                albumes.FirstOrDefault(a => a.Id == Id);
+            var entidad = await _contexto.Albumes.FindAsync(Id);
+            if (entidad == null)
+                return false;
 
-            // Si no existe, devolver false.
-            if (albumExistente == null)
-            {
-                return Task.FromResult(false);
-            }
+            entidad.Titulo = album.Titulo;
+            entidad.Genero = album.Genero;
+            entidad.AnioLanzamiento = album.AnioLanzamiento;
+            entidad.CantidadCanciones = album.CantidadCanciones;
+            entidad.ArtistaId = album.ArtistaId;
 
-            // Actualizar los datos del álbum.
-            albumExistente.Titulo = album.Titulo;
-            albumExistente.Artista = album.Artista;
-            albumExistente.Genero = album.Genero;
-            albumExistente.AnioLanzamiento = album.AnioLanzamiento;
-            albumExistente.CantidadCanciones = album.CantidadCanciones;
-
-            return Task.FromResult(true);
+            await _contexto.SaveChangesAsync();
+            return true;
         }
 
-        //Eliminar (DELETE).
-        public Task<bool> Eliminar(Guid Id)
+        // DELETE: quita el álbum si existe.
+        public async Task<bool> Eliminar(Guid Id)
         {
-            // Buscar el álbum que se desea eliminar.
-            AlbumResponse? albumExistente =
-                albumes.FirstOrDefault(a => a.Id == Id);
+            var entidad = await _contexto.Albumes.FindAsync(Id);
+            if (entidad == null)
+                return false;
 
-            // Si no existe, devolver false.
-            if (albumExistente == null)
-            {
-                return Task.FromResult(false);
-            }
-
-            // Eliminar el álbum de la lista.
-            albumes.Remove(albumExistente);
-
-            return Task.FromResult(true);
+            _contexto.Albumes.Remove(entidad);
+            await _contexto.SaveChangesAsync();
+            return true;
         }
 
+        // Convierte la entidad en el modelo que devuelve la API.
+        private static AlbumResponse AResponse(AlbumEntidad a) => new AlbumResponse
+        {
+            Id = a.Id,
+            Titulo = a.Titulo,
+            Genero = a.Genero,
+            AnioLanzamiento = a.AnioLanzamiento,
+            CantidadCanciones = a.CantidadCanciones,
+            ArtistaId = a.ArtistaId,
+            Artista = a.Artista.Nombre
+        };
     }
 }
